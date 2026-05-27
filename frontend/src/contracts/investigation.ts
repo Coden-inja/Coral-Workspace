@@ -1,11 +1,11 @@
-import type { StatusTone } from "@/components/shared/status-badge";
+import type { InvestigationStatus, SeverityLevel, StatusTone } from "@/types/common";
 
 export type InvestigationSummary = {
   id: string;
   title: string;
-  severity: "Critical" | "High" | "Medium" | "Low";
+  severity: SeverityLevel;
   severityTone: StatusTone;
-  status: "Investigating" | "Contained" | "Awaiting Analyst" | "Resolved";
+  status: InvestigationStatus;
   statusTone: StatusTone;
   shortDescription: string;
   updatedAt: string;
@@ -20,7 +20,7 @@ export type RecentAlert = {
   updatedAt: string;
 };
 
-export type EvidenceCardModel = {
+export type Evidence = {
   id: string;
   title: string;
   evidenceType: string;
@@ -40,7 +40,7 @@ export type EvidenceCardModel = {
   rawTelemetry: Record<string, unknown>;
 };
 
-export type AiReasoningStepModel = {
+export type AiReasoningStep = {
   id: string;
   stepLabel: string;
   hypothesis: string;
@@ -50,7 +50,7 @@ export type AiReasoningStepModel = {
   sources: string[];
 };
 
-export type InvestigationTimelineStepModel = {
+export type TimelineStep = {
   id: string;
   index: number;
   timeLabel: string;
@@ -59,30 +59,11 @@ export type InvestigationTimelineStepModel = {
   severityTone: StatusTone;
   linkedSystems: string[];
   linkedEvents: string[];
-  evidence: EvidenceCardModel[];
-  aiReasoning: AiReasoningStepModel[];
+  evidence: Evidence[];
+  aiReasoning: AiReasoningStep[];
 };
 
-export type ContainmentRecommendationModel = {
-  id: string;
-  title: string;
-  action: string;
-  owner: string;
-  dueIn: string;
-  impact: string;
-  status: string;
-  tone: StatusTone;
-};
-
-export type AnalystActivityModel = {
-  id: string;
-  actor: string;
-  activity: string;
-  timeLabel: string;
-  tone: StatusTone;
-};
-
-export type AttackChainNodeModel = {
+export type GraphNode = {
   id: string;
   label: string;
   tone: StatusTone;
@@ -93,16 +74,47 @@ export type AttackChainNodeModel = {
   relatedEvidenceId?: string;
 };
 
-export type AttackChainEdgeModel = {
+export type GraphEdge = {
   id: string;
   fromId: string;
   toId: string;
-  label:
-    | "login activity"
-    | "escalation"
-    | "token reuse"
-    | "code push"
-    | "communication linkage";
+  label: "login activity" | "escalation" | "token reuse" | "code push" | "communication linkage";
+};
+
+export type ContainmentRecommendation = {
+  id: string;
+  title: string;
+  action: string;
+  owner: string;
+  dueIn: string;
+  impact: string;
+  status: string;
+  tone: StatusTone;
+};
+
+export type AnalystEvent = {
+  id: string;
+  actor: string;
+  activity: string;
+  timeLabel: string;
+  tone: StatusTone;
+};
+
+export type Investigation = {
+  id: string;
+  title: string;
+  summary: string;
+  overallStatus: InvestigationStatus;
+  overallTone: StatusTone;
+  startedAt: string;
+  updatedAt: string;
+  timeline: TimelineStep[];
+  attackChain: {
+    nodes: GraphNode[];
+    edges: GraphEdge[];
+  };
+  containment: ContainmentRecommendation[];
+  analystActivity: AnalystEvent[];
 };
 
 export type EvidenceDrawerItem = {
@@ -121,21 +133,3 @@ export type EvidenceDrawerItem = {
   evidenceType: string;
   summary: string;
 };
-
-export type InvestigationDetail = {
-  id: string;
-  title: string;
-  summary: string;
-  overallStatus: string;
-  overallTone: StatusTone;
-  startedAt: string;
-  updatedAt: string;
-  timeline: InvestigationTimelineStepModel[];
-  attackChain: {
-    nodes: AttackChainNodeModel[];
-    edges: AttackChainEdgeModel[];
-  };
-  containment: ContainmentRecommendationModel[];
-  analystActivity: AnalystActivityModel[];
-};
-

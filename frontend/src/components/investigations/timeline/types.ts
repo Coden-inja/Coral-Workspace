@@ -1,12 +1,12 @@
 export type {
-  AiReasoningStepModel,
-  AnalystActivityModel,
-  AttackChainEdgeModel,
-  AttackChainNodeModel,
-  ContainmentRecommendationModel,
-  EvidenceCardModel,
+  AiReasoningStep as AiReasoningStepModel,
+  AnalystEvent as AnalystActivityModel,
+  ContainmentRecommendation as ContainmentRecommendationModel,
+  Evidence as EvidenceCardModel,
   EvidenceDrawerItem,
-  InvestigationDetail as InvestigationModel,
-  InvestigationTimelineStepModel,
-} from "@/lib/mock-data";
+  GraphEdge as AttackChainEdgeModel,
+  GraphNode as AttackChainNodeModel,
+  Investigation as InvestigationModel,
+  TimelineStep as InvestigationTimelineStepModel,
+} from "@/contracts";
 

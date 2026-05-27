@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 import { ToastProvider, useToast } from "@/components/shared/toast-system";
-import { subscribeToMockOpsEvents } from "@/lib/live/ops-event-stream";
-import { getAllInvestigations } from "@/lib/mock-data";
+import type { InvestigationSummary } from "@/contracts";
+import { useOpsEvents } from "@/hooks/use-ops-events";
+import { getInvestigations } from "@/services/api";
 
 type LiveOpsProviderProps = {
   children: ReactNode;
@@ -14,8 +15,9 @@ type LiveOpsProviderProps = {
 function LiveOpsEventsBridge() {
   const { pushToast } = useToast();
 
-  useEffect(() => {
-    return subscribeToMockOpsEvents((event) => {
+  useOpsEvents({
+    intervalMs: 4500,
+    onEvent: (event) => {
       if (event.type === "alert_update") {
         pushToast({ title: "New Alert Update", message: `Alert ${event.alertId} -> ${event.value}`, tone: event.severity === "critical" ? "critical" : event.severity === "warning" ? "warning" : "info" });
       }
@@ -28,17 +30,21 @@ function LiveOpsEventsBridge() {
       if (event.type === "connector_status" && event.status === "offline") {
         pushToast({ title: "Connector Offline", message: `${event.connector} is offline`, tone: "warning" });
       }
-    }, 4500);
-  }, [pushToast]);
+    },
+  });
 
   return null;
 }
 
 function CommandPalette() {
   const router = useRouter();
-  const investigations = useMemo(() => getAllInvestigations(), []);
+  const [investigations, setInvestigations] = useState<InvestigationSummary[]>([]);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    void getInvestigations().then(setInvestigations);
+  }, []);
 
   const staticActions = useMemo(
     () => [

@@ -2,14 +2,12 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-type ToastTone = "info" | "warning" | "critical" | "success";
+import type { ToastEvent } from "@/contracts";
+import type { ToastTone } from "@/types/common";
 
 type ToastItem = {
   id: string;
-  title: string;
-  message: string;
-  tone: ToastTone;
-};
+} & ToastEvent;
 
 type ToastContextValue = {
   pushToast: (toast: Omit<ToastItem, "id">) => void;

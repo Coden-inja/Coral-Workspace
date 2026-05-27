@@ -7,8 +7,8 @@ import { MetricCard } from "@/components/shared/metric-card";
 import { Panel } from "@/components/shared/panel";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StatusBadge } from "@/components/shared/status-badge";
-import type { InvestigationSummary, RecentAlert } from "@/lib/mock-data";
-import { subscribeToMockOpsEvents } from "@/lib/live/ops-event-stream";
+import type { InvestigationSummary, RecentAlert } from "@/contracts";
+import { subscribeToOpsEvents } from "@/services/realtime";
 
 type OverviewDashboardProps = {
   alerts: RecentAlert[];
@@ -20,7 +20,7 @@ export function OverviewDashboard({ alerts, incidents }: OverviewDashboardProps)
   const [liveIncidents, setLiveIncidents] = useState(incidents);
 
   useEffect(() => {
-    return subscribeToMockOpsEvents((event) => {
+    return subscribeToOpsEvents((event) => {
       if (event.type === "alert_update") {
         setLiveAlerts((prev) =>
           prev.map((alert) => (alert.id === event.alertId ? { ...alert, value: event.value, updatedAt: "moments ago" } : alert)),

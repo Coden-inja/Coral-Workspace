@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { EvidenceCardModel, EvidenceDrawerItem, InvestigationModel } from "@/components/investigations/timeline/types";
 import { TimelineStep } from "@/components/investigations/timeline/timeline-step";
@@ -12,7 +12,7 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useInvestigationStore } from "@/components/investigations/state/investigation-store";
 import { useInvestigationEvents } from "@/hooks/use-investigation-events";
-import { subscribeToMockOpsEvents } from "@/lib/live/ops-event-stream";
+import { useOpsEvents } from "@/hooks/use-ops-events";
 
 type InvestigationTimelineProps = {
   investigation: InvestigationModel;
@@ -49,8 +49,9 @@ export function InvestigationTimeline({ investigation }: InvestigationTimelinePr
     onConnectionChange: setWebsocketConnected,
   });
 
-  useEffect(() => {
-    return subscribeToMockOpsEvents((event) => {
+  useOpsEvents({
+    intervalMs: 4200,
+    onEvent: (event) => {
       if (event.type === "analyst_activity" && event.incidentId === investigation.id) {
         const id = `live-${Date.now()}`;
         setLiveActivities((prev) => [{ id, actor: event.actor, activity: event.message, timeLabel: "now", tone: event.tone }, ...prev].slice(0, 8));
@@ -65,8 +66,8 @@ export function InvestigationTimeline({ investigation }: InvestigationTimelinePr
           setLiveStepPulseIds((prev) => prev.filter((stepId) => stepId !== event.stepId));
         }, 1400);
       }
-    }, 4200);
-  }, [investigation.id]);
+    },
+  });
 
   const timeline = useMemo(
     () =>

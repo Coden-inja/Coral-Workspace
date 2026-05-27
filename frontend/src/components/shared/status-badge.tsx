@@ -1,6 +1,7 @@
 "use client";
 
-type StatusTone = "neutral" | "healthy" | "warning" | "critical" | "info";
+import type { StatusTone } from "@/types/common";
+
 type StatusSize = "sm" | "md";
 
 type StatusBadgeProps = {

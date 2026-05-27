@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Panel } from "@/components/shared/panel";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { getInvestigationById } from "@/lib/mock-data";
+import { getInvestigationById } from "@/services/api";
 
 type InvestigationDetailPageProps = {
   params?: {
@@ -11,8 +11,8 @@ type InvestigationDetailPageProps = {
   };
 };
 
-export default function InvestigationDetailPage({ params }: InvestigationDetailPageProps) {
-  const investigation = getInvestigationById(params?.id);
+export default async function InvestigationDetailPage({ params }: InvestigationDetailPageProps) {
+  const investigation = await getInvestigationById(params?.id);
 
   return (
     <div className="space-y-4">

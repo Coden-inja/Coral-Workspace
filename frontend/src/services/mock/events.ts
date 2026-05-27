@@ -1,11 +1,4 @@
-export type OpsEvent =
-  | { type: "alert_update"; alertId: string; value: string; severity: "info" | "warning" | "critical" }
-  | { type: "incident_status"; incidentId: string; status: "Investigating" | "Contained" | "Awaiting Analyst" | "Resolved" }
-  | { type: "investigation_step"; incidentId: string; stepId: string }
-  | { type: "analyst_activity"; incidentId: string; actor: string; message: string; tone: "info" | "warning" | "critical" | "healthy" }
-  | { type: "connector_status"; connector: string; status: "healthy" | "degraded" | "offline"; latencyMs: number; ingestionPerMin: number }
-  | { type: "escalation"; incidentId: string; message: string }
-  | { type: "containment_completed"; incidentId: string; message: string };
+import type { WebsocketOpsEvent } from "@/contracts";
 
 const incidentIds = ["INC-1042", "INC-1038", "INC-1032"];
 const stepIds = ["step-1", "step-2", "step-3", "step-4", "step-5", "step-6"];
@@ -16,7 +9,7 @@ function randomItem<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)] as T;
 }
 
-function makeEvent(): OpsEvent {
+export function generateMockOpsEvent(): WebsocketOpsEvent {
   const roll = Math.random();
   if (roll < 0.2) {
     return {
@@ -67,14 +60,3 @@ function makeEvent(): OpsEvent {
     ? { type: "escalation", incidentId: randomItem(incidentIds), message: "Privilege escalation risk increased." }
     : { type: "containment_completed", incidentId: randomItem(incidentIds), message: "Containment action completed." };
 }
-
-export function subscribeToMockOpsEvents(
-  callback: (event: OpsEvent) => void,
-  intervalMs = 3500,
-): () => void {
-  const interval = window.setInterval(() => {
-    callback(makeEvent());
-  }, intervalMs);
-  return () => window.clearInterval(interval);
-}
-

@@ -2,15 +2,16 @@ import type { ReactNode } from "react";
 
 import { DashboardShell } from "@/components/shell/dashboard-shell";
 import { LiveOpsProvider } from "@/components/ops/live-ops-provider";
-import { getRecentAlerts } from "@/lib/mock-data";
 import type { TopbarMetric } from "@/components/shell/topbar";
+import { getRecentAlerts } from "@/services/api";
 
 type OpsLayoutProps = {
   children: ReactNode;
 };
 
-export default function OpsLayout({ children }: OpsLayoutProps) {
-  const metrics: TopbarMetric[] = getRecentAlerts().map((alert) => ({
+export default async function OpsLayout({ children }: OpsLayoutProps) {
+  const alerts = await getRecentAlerts();
+  const metrics: TopbarMetric[] = alerts.map((alert) => ({
     id: alert.id,
     label: alert.label,
     value: alert.value,

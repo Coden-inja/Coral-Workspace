@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useReducer, type ReactNode } from "react";
 
-import type { EvidenceCardModel, EvidenceDrawerItem, InvestigationDetail } from "@/lib/mock-data";
+import type { Evidence as EvidenceCardModel, EvidenceDrawerItem, Investigation as InvestigationDetail } from "@/contracts";
 
 type InvestigationState = {
   selectedInvestigationId: string;

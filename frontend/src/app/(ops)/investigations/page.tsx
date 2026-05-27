@@ -1,8 +1,8 @@
 import { InvestigationQueueView } from "@/components/investigations/investigation-queue-view";
-import { fetchInvestigationSummaries } from "@/lib/services/investigation-service";
+import { getInvestigations } from "@/services/api";
 
 export default async function InvestigationsPage() {
-  const investigations = await fetchInvestigationSummaries();
+  const investigations = await getInvestigations();
   return <InvestigationQueueView investigations={investigations} />;
 }
 

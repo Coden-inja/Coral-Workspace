@@ -5,42 +5,30 @@ import { useEffect, useState } from "react";
 import { Panel } from "@/components/shared/panel";
 import { SectionHeader } from "@/components/shared/section-header";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { subscribeToMockOpsEvents } from "@/lib/live/ops-event-stream";
-
-type ConnectorState = {
-  id: string;
-  status: "healthy" | "degraded" | "offline";
-  latencyMs: number;
-  ingestionPerMin: number;
-};
-
-const initialConnectors: ConnectorState[] = [
-  { id: "okta-connector", status: "healthy", latencyMs: 54, ingestionPerMin: 3200 },
-  { id: "aws-cloudtrail-connector", status: "healthy", latencyMs: 38, ingestionPerMin: 9400 },
-  { id: "github-enterprise-connector", status: "degraded", latencyMs: 120, ingestionPerMin: 1800 },
-  { id: "slack-enterprise-connector", status: "healthy", latencyMs: 70, ingestionPerMin: 2400 },
-];
+import type { ConnectorStatus } from "@/contracts";
+import { useOpsEvents } from "@/hooks/use-ops-events";
+import { getConnectorStatus } from "@/services/api";
 
 export default function ConnectorsPage() {
-  const [connectors, setConnectors] = useState(initialConnectors);
+  const [connectors, setConnectors] = useState<ConnectorStatus[]>([]);
 
   useEffect(() => {
-    return subscribeToMockOpsEvents((event) => {
+    void getConnectorStatus().then(setConnectors);
+  }, []);
+
+  useOpsEvents({
+    intervalMs: 5000,
+    onEvent: (event) => {
       if (event.type !== "connector_status") return;
       setConnectors((prev) =>
         prev.map((connector) =>
           connector.id === event.connector
-            ? {
-                ...connector,
-                status: event.status,
-                latencyMs: event.latencyMs,
-                ingestionPerMin: event.ingestionPerMin,
-              }
+            ? { ...connector, status: event.status, latencyMs: event.latencyMs, ingestionPerMin: event.ingestionPerMin }
             : connector,
         ),
       );
-    }, 5000);
-  }, []);
+    },
+  });
 
   return (
     <div className="space-y-3">

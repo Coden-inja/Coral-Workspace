@@ -1,10 +1,7 @@
-import type {
-  EvidenceCardModel,
-  InvestigationDetail,
-  InvestigationSummary,
-  RecentAlert,
-} from "@/lib/mock-data/types";
-import type { StatusTone } from "@/components/shared/status-badge";
+import type { Evidence, Investigation, InvestigationSummary, RecentAlert, TimelineStep } from "@/contracts";
+import type { StatusTone } from "@/types/common";
+import { getMockAttackChain } from "@/services/mock/graph";
+import { getEvidenceTelemetry } from "@/services/mock/telemetry";
 
 const tone = {
   neutral: "neutral",
@@ -57,18 +54,17 @@ const recentAlerts: RecentAlert[] = [
   { id: "a4", label: "p95 Query", value: "228ms", tone: tone.info, updatedAt: "1m ago" },
 ];
 
-function buildEvidence(input: EvidenceCardModel): EvidenceCardModel {
-  return input;
+function buildEvidence(input: Omit<Evidence, "rawTelemetry">): Evidence {
+  return { ...input, rawTelemetry: getEvidenceTelemetry(input.id) };
 }
 
-const baseTimeline = [
+const baseTimeline: TimelineStep[] = [
   {
     id: "step-1",
     index: 1,
     timeLabel: "19:10:18",
     title: "Foreign login detected",
-    narrative:
-      "Authentication request arrived from an anomalous ASN/geolocation pairing and crossed escalation threshold.",
+    narrative: "Authentication request arrived from an anomalous ASN/geolocation pairing and crossed escalation threshold.",
     severityTone: tone.critical,
     linkedSystems: ["Okta Identity Cloud", "Auth Gateway"],
     linkedEvents: ["Login risk score=0.91", "geo=non-us asn=unknown"],
@@ -90,13 +86,6 @@ const baseTimeline = [
         sourceConnector: "okta-connector",
         analystNotes: "Geo and ASN mismatch confirmed against user travel baseline.",
         aiReasoningSummary: "High-confidence identity anomaly with replay characteristics.",
-        rawTelemetry: {
-          sourceIp: "91.214.88.14",
-          geoCountry: "Unknown",
-          asn: "AS49392",
-          deviceFingerprint: "fp-c9a2-7bc1",
-          riskScore: 0.91,
-        },
       }),
     ],
     aiReasoning: [
@@ -137,12 +126,6 @@ const baseTimeline = [
         sourceConnector: "github-enterprise-connector",
         analystNotes: "Repository is privileged; push pattern unusual for actor schedule.",
         aiReasoningSummary: "Code activity likely linked to identity compromise chain.",
-        rawTelemetry: {
-          repository: "security-tools",
-          actor: "svc-prod-ops",
-          commitHash: "4d39a1f",
-          branch: "main",
-        },
       }),
     ],
     aiReasoning: [
@@ -183,12 +166,6 @@ const baseTimeline = [
         sourceConnector: "aws-cloudtrail-connector",
         analystNotes: "Role escalation occurs within two minutes of suspicious login.",
         aiReasoningSummary: "Privilege escalation stage confirms high-severity progression.",
-        rawTelemetry: {
-          eventName: "AssumeRole",
-          targetRole: "prod-admin",
-          callerArn: "arn:aws:iam::111111:user/svc-prod-ops",
-          sourceIp: "91.214.88.14",
-        },
       }),
     ],
     aiReasoning: [
@@ -229,11 +206,6 @@ const baseTimeline = [
         sourceConnector: "slack-enterprise-connector",
         analystNotes: "Mentions contain operational terms tied to active escalation.",
         aiReasoningSummary: "Potential attacker coordination signal in collaboration tooling.",
-        rawTelemetry: {
-          channel: "sec-ops",
-          keywordHits: ["containment-bypass", "role-override"],
-          participantCount: 4,
-        },
       }),
     ],
     aiReasoning: [
@@ -274,12 +246,6 @@ const baseTimeline = [
         sourceConnector: "coral-query-engine",
         analystNotes: "Inference aligns with observed event ordering and system touchpoints.",
         aiReasoningSummary: "Graph model highlights critical escalation path with high confidence.",
-        rawTelemetry: {
-          pathDepth: 4,
-          confidence: 0.82,
-          nodes: 6,
-          edges: 5,
-        },
       }),
     ],
     aiReasoning: [
@@ -320,11 +286,6 @@ const baseTimeline = [
         sourceConnector: "response-orchestration-engine",
         analystNotes: "Action sequence reviewed for blast-radius and forensic preservation.",
         aiReasoningSummary: "Containment package recommended as immediate mitigation sequence.",
-        rawTelemetry: {
-          sequence: ["revoke tokens", "constrain role assumptions", "lock evidence window"],
-          requiresApproval: true,
-          blastRadiusScore: 0.21,
-        },
       }),
     ],
     aiReasoning: [
@@ -341,88 +302,17 @@ const baseTimeline = [
   },
 ];
 
-const detailsById: Record<string, InvestigationDetail> = {
+const detailsById: Record<string, Investigation> = {
   "INC-1042": {
     id: "INC-1042",
     title: "Credential misuse from anomalous ASN",
-    summary:
-      "A correlated identity anomaly progressed into code deployment preparation and privileged cloud role escalation.",
+    summary: "A correlated identity anomaly progressed into code deployment preparation and privileged cloud role escalation.",
     overallStatus: "Investigating",
     overallTone: tone.critical,
     startedAt: "19:10:18",
     updatedAt: "19:23:33",
     timeline: baseTimeline,
-    attackChain: {
-      nodes: [
-        {
-          id: "n1",
-          label: "Compromised Identity",
-          tone: tone.critical,
-          kind: "identity",
-          x: 60,
-          y: 60,
-          relatedStepIds: ["step-1", "step-2"],
-          relatedEvidenceId: "ev-1",
-        },
-        {
-          id: "n2",
-          label: "GitHub Repository",
-          tone: tone.warning,
-          kind: "repository",
-          x: 220,
-          y: 40,
-          relatedStepIds: ["step-2"],
-          relatedEvidenceId: "ev-2",
-        },
-        {
-          id: "n3",
-          label: "AWS Prod Role",
-          tone: tone.critical,
-          kind: "cloud-role",
-          x: 390,
-          y: 70,
-          relatedStepIds: ["step-3"],
-          relatedEvidenceId: "ev-3",
-        },
-        {
-          id: "n4",
-          label: "Slack SecOps",
-          tone: tone.info,
-          kind: "slack-channel",
-          x: 520,
-          y: 40,
-          relatedStepIds: ["step-4"],
-          relatedEvidenceId: "ev-4",
-        },
-        {
-          id: "n5",
-          label: "Coral Graph",
-          tone: tone.warning,
-          kind: "connector",
-          x: 330,
-          y: 170,
-          relatedStepIds: ["step-5"],
-          relatedEvidenceId: "ev-5",
-        },
-        {
-          id: "n6",
-          label: "Endpoint Host",
-          tone: tone.warning,
-          kind: "endpoint",
-          x: 120,
-          y: 180,
-          relatedStepIds: ["step-1", "step-6"],
-          relatedEvidenceId: "ev-6",
-        },
-      ],
-      edges: [
-        { id: "e1", fromId: "n1", toId: "n2", label: "code push" },
-        { id: "e2", fromId: "n1", toId: "n3", label: "escalation" },
-        { id: "e3", fromId: "n1", toId: "n6", label: "token reuse" },
-        { id: "e4", fromId: "n3", toId: "n4", label: "communication linkage" },
-        { id: "e5", fromId: "n6", toId: "n5", label: "login activity" },
-      ],
-    },
+    attackChain: getMockAttackChain({ critical: tone.critical, warning: tone.warning, info: tone.info }),
     containment: [
       {
         id: "c1",
@@ -456,27 +346,9 @@ const detailsById: Record<string, InvestigationDetail> = {
       },
     ],
     analystActivity: [
-      {
-        id: "a1",
-        actor: "Analyst Lin",
-        activity: "Reviewed correlated login and token reuse signals.",
-        timeLabel: "19:22:10",
-        tone: tone.info,
-      },
-      {
-        id: "a2",
-        actor: "Agent Sigma",
-        activity: "Generated attack chain graph and attached cross-layer evidence.",
-        timeLabel: "19:20:07",
-        tone: tone.warning,
-      },
-      {
-        id: "a3",
-        actor: "Automations",
-        activity: "Prepared staged containment package and evidence lock windows.",
-        timeLabel: "19:23:33",
-        tone: tone.critical,
-      },
+      { id: "a1", actor: "Analyst Lin", activity: "Reviewed correlated login and token reuse signals.", timeLabel: "19:22:10", tone: tone.info },
+      { id: "a2", actor: "Agent Sigma", activity: "Generated attack chain graph and attached cross-layer evidence.", timeLabel: "19:20:07", tone: tone.warning },
+      { id: "a3", actor: "Automations", activity: "Prepared staged containment package and evidence lock windows.", timeLabel: "19:23:33", tone: tone.critical },
     ],
   },
 };
@@ -486,20 +358,19 @@ function normalizeInvestigationId(incidentId?: string | null): string {
   return candidate.length > 0 ? candidate : "INC-1042";
 }
 
-export function getAllInvestigations(): InvestigationSummary[] {
+export function getMockInvestigations(): InvestigationSummary[] {
   return investigationSummaries;
 }
 
-export function getInvestigationById(incidentId?: string | null): InvestigationDetail {
+export function getMockInvestigationById(incidentId?: string | null): Investigation {
   const normalized = normalizeInvestigationId(incidentId);
   return detailsById[normalized] ?? detailsById["INC-1042"];
 }
 
-export function getRecentAlerts(): RecentAlert[] {
+export function getMockRecentAlerts(): RecentAlert[] {
   return recentAlerts;
 }
 
-export function getTimelineSteps(incidentId?: string | null) {
-  return getInvestigationById(incidentId).timeline;
+export function getMockTimeline(incidentId?: string | null): TimelineStep[] {
+  return getMockInvestigationById(incidentId).timeline;
 }
-

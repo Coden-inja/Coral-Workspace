@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { EvidenceDrawerItem } from "@/lib/mock-data";
+import type { EvidenceDrawerItem } from "@/contracts";
 import { StatusBadge } from "@/components/shared/status-badge";
 
 type EvidenceDrawerProps = {

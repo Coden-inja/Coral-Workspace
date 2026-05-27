@@ -1,7 +1,7 @@
 import { InvestigationTimeline } from "@/components/investigations/timeline/investigation-timeline";
 import { InvestigationStoreProvider } from "@/components/investigations/state/investigation-store";
-import { fetchInvestigationDetail } from "@/lib/services/investigation-service";
 import { Panel } from "@/components/shared/panel";
+import { getInvestigationById } from "@/services/api";
 
 type TimelinePageProps = {
   params?: {
@@ -10,7 +10,7 @@ type TimelinePageProps = {
 };
 
 export default async function TimelinePage({ params }: TimelinePageProps) {
-  const loadResult = await fetchInvestigationDetail(params?.id)
+  const loadResult = await getInvestigationById(params?.id)
     .then((data) => ({ investigation: data, error: null as string | null }))
     .catch((error: unknown) => ({
       investigation: null,

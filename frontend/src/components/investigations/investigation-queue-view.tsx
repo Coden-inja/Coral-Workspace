@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { SectionHeader } from "@/components/shared/section-header";
 import { StatusBadge } from "@/components/shared/status-badge";
-import type { InvestigationSummary } from "@/lib/mock-data";
+import type { InvestigationSummary } from "@/contracts";
 
 type InvestigationQueueViewProps = {
   investigations: InvestigationSummary[];
