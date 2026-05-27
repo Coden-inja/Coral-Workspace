@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+Use:
+- feature-based architecture
+- reusable shared UI
+- isolated business logic hooks
+- scalable folder boundaries
+
+Avoid:
+- giant page files
+- duplicated state
+- monolithic components

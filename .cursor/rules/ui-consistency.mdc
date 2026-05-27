@@ -1,0 +1,14 @@
+---
+alwaysApply: true
+---
+Maintain:
+- spacing consistency
+- typography consistency
+- operational density
+- infrastructure aesthetics
+
+Use:
+- shared cards
+- shared tables
+- shared badges
+- shared layouts
