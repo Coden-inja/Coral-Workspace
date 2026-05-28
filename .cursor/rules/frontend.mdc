@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+Always follow:
+- ai/PROJECT_CONTEXT.md
+- ai/DESIGN_SYSTEM.md
+- ai/AI_WORKFLOW_RULES.md
+- ai/FRONTEND_RULES.md
+
+Generate:
+- reusable components
+- enterprise operational UI
+- scalable feature architecture
+
+Never generate:
+- startup gradient aesthetics
+- glassmorphism
+- neon dashboards
