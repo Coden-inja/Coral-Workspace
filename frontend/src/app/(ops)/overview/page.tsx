@@ -1,8 +1,18 @@
-import { OverviewDashboard } from "@/components/overview/overview-dashboard";
-import { getInvestigations, getRecentAlerts } from "@/services/api";
+import { OverviewDashboardRouter } from "@/components/overview/overview-dashboard-router";
+import { getAdminDashboardSnapshot, getCommandCenterSnapshot, getInvestigations } from "@/services/api";
 
 export default async function OverviewPage() {
-  const [alerts, incidents] = await Promise.all([getRecentAlerts(), getInvestigations()]);
-  return <OverviewDashboard alerts={alerts} incidents={incidents} />;
-}
+  const [adminSnapshot, commandSnapshot, incidents] = await Promise.all([
+    getAdminDashboardSnapshot(),
+    getCommandCenterSnapshot(),
+    getInvestigations(),
+  ]);
 
+  return (
+    <OverviewDashboardRouter
+      adminSnapshot={adminSnapshot}
+      commandSnapshot={commandSnapshot}
+      incidents={incidents}
+    />
+  );
+}

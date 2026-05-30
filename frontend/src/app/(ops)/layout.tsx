@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 
-import { DashboardShell } from "@/components/shell/dashboard-shell";
+import { OpsRouteGuard } from "@/components/auth/ops-route-guard";
 import { LiveOpsProvider } from "@/components/ops/live-ops-provider";
+import { OpsDashboardShell } from "@/components/shell/ops-dashboard-shell";
 import type { TopbarMetric } from "@/components/shell/topbar";
 import { getRecentAlerts } from "@/services/api";
 
@@ -21,14 +22,16 @@ export default async function OpsLayout({ children }: OpsLayoutProps) {
   }));
 
   return (
-    <DashboardShell
-      workspaceName="CoralOps SOC"
-      topbarTitle="CoralOps Investigation Operations"
-      environment="Production"
-      metrics={metrics}
-    >
-      <LiveOpsProvider>{children}</LiveOpsProvider>
-    </DashboardShell>
+    <OpsRouteGuard>
+      <OpsDashboardShell
+        workspaceName="CoralOps SOC"
+        topbarTitle="CoralOps Investigation Operations"
+        environment="Production"
+        metrics={metrics}
+      >
+        <LiveOpsProvider>{children}</LiveOpsProvider>
+      </OpsDashboardShell>
+    </OpsRouteGuard>
   );
 }
 
