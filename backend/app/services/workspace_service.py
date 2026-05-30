@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.workspace_model import Workspace
+from app.models.workspace import Workspace
 
 def create_workspace(
     db: Session,

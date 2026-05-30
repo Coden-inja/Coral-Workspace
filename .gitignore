@@ -106,3 +106,9 @@ vector-cache/
 
 *.swp
 *.swo
+
+#==========================
+# CORAL WORKSPACE SPECIFIC
+#==========================
+tools/coral/coral+
+tools/coral/*.tar.gz

@@ -8,7 +8,7 @@ from app.models.query_model import Query
 from app.routes.auth import router as auth_router
 from app.routes.workspaces import router as workspace_router
 from app.routes.query import router as query_router
-from app.routes.connectors import router as connection_router
+from app.routes.connector import router as connection_router
 
 Base.metadata.create_all(
     bind=engine
@@ -24,4 +24,11 @@ app.include_router(connection_router)
 def home():
     return {
         "message": "Coral Backend Running"
+    }
+
+@app.get("/health")
+def health():
+
+    return {
+        "status": "healthy"
     }
