@@ -138,8 +138,8 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 border-b border-zinc-800 px-4 py-3.5">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900">
-          <span className="text-[11px] font-bold tracking-tight text-blue-400/90">C</span>
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-zinc-700 bg-zinc-950">
+          <img src="/logo.jpg" alt="CoralTeams Logo" className="h-full w-full object-cover" />
         </div>
         <span className="text-sm font-semibold tracking-tight text-zinc-100">CoralTeams</span>
       </div>

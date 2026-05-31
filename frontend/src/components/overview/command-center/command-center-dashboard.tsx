@@ -108,6 +108,15 @@ export function CommandCenterDashboard({ snapshot, incidents }: CommandCenterDas
         description="Monitor GitHub, Slack, Sentry, and incident operations from one operational surface."
       />
 
+      {/* Dynamic Retro Pixel Banner */}
+      <div className="overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-950/40 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <img
+          src="/banner.png"
+          alt="CoralTeams Workspace Harbor"
+          className="h-auto w-full object-cover max-h-[220px]"
+        />
+      </div>
+
       <section className="space-y-3">
         <CommandCenterMetrics metrics={metrics} />
       </section>
