@@ -53,7 +53,8 @@ def create_query(
     db.refresh(query)
     
     return {
-        "query": query.query_text,
+        "query_text": query.query_text,
         "generated_sql": query.generated_sql,
+        "conversational_response": coral_response.get("answer", "No response synthesized."),
         "coral_response": coral_response
     }
