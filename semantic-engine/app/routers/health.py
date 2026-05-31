@@ -15,6 +15,6 @@ async def health(
     coral_status = "connected" if await coral.ping() else "disconnected"
     return HealthResponse(
         status="ok",
-        model=f"{settings.model_provider}/{settings.model_name}",
+        model=f"ollama/{settings.model_name}",
         coral=coral_status,
     )

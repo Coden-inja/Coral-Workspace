@@ -14,12 +14,10 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8001
 
-    model_provider: str = "ollama"
     model_name: str = "llama3.2"
-    model_base_url: str = "http://localhost:11434"
-    model_api_key: str = ""
+    ollama_host: str = "http://localhost:11434"
 
-    coral_binary: str = "/workspaces/coral/target/debug/coral"
+    coral_binary: str = "coral"
     coral_base_url: str = "http://localhost:5555"
     coral_api_key: str = ""
 

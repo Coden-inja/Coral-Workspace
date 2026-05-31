@@ -3,7 +3,6 @@ import logging
 from app.config import settings
 from app.providers.base import ModelProvider
 from app.providers.ollama import OllamaProvider
-from app.providers.openai_compat import OpenAICompatProvider
 from app.clients.base import CoralClient
 from app.clients.coral_client import CoralSubprocessClient
 from app.schema.schema_cache import SchemaCache
@@ -18,20 +17,10 @@ _schema_cache: SchemaCache | None = None
 def get_model_provider() -> ModelProvider:
     global _provider
     if _provider is None:
-        match settings.model_provider:
-            case "ollama":
-                _provider = OllamaProvider(
-                    base_url=settings.model_base_url,
-                    model=settings.model_name,
-                )
-            case "openai":
-                _provider = OpenAICompatProvider(
-                    base_url=settings.model_base_url,
-                    model=settings.model_name,
-                    api_key=settings.model_api_key,
-                )
-            case _:
-                raise ValueError(f"Unknown model provider: {settings.model_provider}")
+        _provider = OllamaProvider(
+            base_url=settings.ollama_host,
+            model=settings.model_name,
+        )
     return _provider
 
 
