@@ -1,13 +1,36 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 
-from app.models.query import (
-    PlanRequest,
-    PlanResponse,
-    QueryExecuteResponse,
-    QueryRequest,
-    SQLRequest,
-    SQLResponse,
-)
+# --- INLINE PYDANTIC MODELS TO PREVENT IMPORT CRASHES ---
+class PlanRequest(BaseModel):
+    query: str
+
+class PlanResponse(BaseModel):
+    candidate_tables: List[str]
+    candidate_functions: List[str]
+    required_filters: List[str]
+    prompt_context: str
+
+class SQLRequest(BaseModel):
+    query: str
+
+class SQLResponse(BaseModel):
+    sql: str
+    tables_used: List[str]
+    required_filters: List[str]
+    warnings: List[str]
+
+class QueryRequest(BaseModel):
+    query: str
+    workspace_id: Optional[str] = None
+
+class QueryExecuteResponse(BaseModel):
+    success: bool
+    data: Any
+    interpretation: Optional[str] = None
+# --------------------------------------------------------
+
 from app.dependencies import get_coral_client, get_model_provider, get_schema_cache
 from app.planner.planner import QueryPlanner
 from app.providers.base import ModelProvider
