@@ -19,19 +19,21 @@ type AiAnalysisDashboardProps = {
 export function AiAnalysisDashboard({ snapshot }: AiAnalysisDashboardProps) {
   const [activeTab, setActiveTab] = useState<"nl" | "sql">("nl");
   const [nlQuery, setNlQuery] = useState("Which employees resolved the most incidents?");
-  const [sqlQuery, setSqlQuery] = useState("SELECT id, email, role FROM users LIMIT 5");
+  const [sqlQuery, setSqlQuery] = useState("SELECT id, email FROM users LIMIT 5");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Results states
-  const [nlResponse, setNlResponse] = useState<{ generated_sql?: string; conversational_response?: string } | null>(null);
+  const [nlResponse, setNlResponse] = useState<any | null>(null);
   const [sqlResponse, setSqlResponse] = useState<any[] | null>(null);
+  const [showRawDb, setShowRawDb] = useState(false);
 
   const handleNlSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setNlResponse(null);
+    setShowRawDb(false);
 
     try {
       const res = await fetch("/api/query/nl", {
@@ -45,10 +47,7 @@ export function AiAnalysisDashboard({ snapshot }: AiAnalysisDashboardProps) {
       }
 
       const data = await res.json();
-      setNlResponse({
-        generated_sql: data.generated_sql,
-        conversational_response: data.conversational_response,
-      });
+      setNlResponse(data);
     } catch (err: any) {
       setError(err.message || "An error occurred while executing the AI copilot query.");
     } finally {
@@ -167,7 +166,7 @@ export function AiAnalysisDashboard({ snapshot }: AiAnalysisDashboardProps) {
                   onChange={(e) => setSqlQuery(e.target.value)}
                   rows={2}
                   className="w-full font-mono rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-purple-500/70 focus:outline-none"
-                  placeholder="e.g. SELECT * FROM users LIMIT 5"
+                  placeholder="e.g. SELECT id, email FROM users LIMIT 5"
                 />
                 <div className="flex justify-end">
                   <button
@@ -206,11 +205,39 @@ export function AiAnalysisDashboard({ snapshot }: AiAnalysisDashboardProps) {
                 {nlResponse.generated_sql || "-- No SQL generated"}
               </pre>
             </div>
+            
             <div className="rounded-lg border border-cyan-850 bg-cyan-950/10 p-4">
               <h3 className="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">🤖 Conversational SOC Synthesis (Grounded)</h3>
               <div className="text-sm text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap">
                 {nlResponse.conversational_response || "No response synthesized."}
               </div>
+            </div>
+
+            {/* 📊 Collapsible fact-check accordion for ultimate transparency */}
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/20 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowRawDb(!showRawDb)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/50 hover:bg-zinc-900 transition-colors text-left"
+              >
+                <span className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
+                  📊 Inspect Raw Database Query Results (Fact Check)
+                </span>
+                <span className="text-[10px] px-2 py-0.5 bg-zinc-800 rounded font-mono text-zinc-400">
+                  {showRawDb ? "Hide ▴" : "Show ▾"}
+                </span>
+              </button>
+              
+              {showRawDb && (
+                <div className="p-4 border-t border-zinc-800 bg-zinc-950">
+                  <p className="text-[11px] text-zinc-400 mb-2">
+                    Below is the exact raw data returned by the database. The AI model synthesized the conversational response above strictly using these records.
+                  </p>
+                  <pre className="font-mono text-xs text-zinc-300 bg-zinc-900/40 p-3 rounded max-h-[200px] overflow-y-auto overflow-x-auto">
+                    {JSON.stringify(nlResponse.coral_response?.query_results || [], null, 2)}
+                  </pre>
+                </div>
+              )}
             </div>
           </div>
         )}

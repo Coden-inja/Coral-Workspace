@@ -158,6 +158,13 @@ def main():
             print("\n🎉 E2E Scenario 1 Completed Successfully!")
             print(f"⚙️  Translated SQL: {result.get('generated_sql')}")
             print("-" * 80)
+            
+            # Transparency logging: Print exactly what facts the Coral database returned
+            coral_resp = result.get("coral_response", {})
+            raw_db_results = coral_resp.get("query_results", [])
+            print(f"📊 Raw Coral Database Query Results (Fact Check): {raw_db_results}")
+            
+            print("-" * 80)
             print("🤖 Conversational Response (Synthesized via Google Colab GPU):")
             print(result.get("conversational_response"))
             print("-" * 80)
@@ -172,9 +179,10 @@ def main():
     print_section("E2E SCENARIO 2: Direct Developer SQL Terminal (Raw SQL -> Pure JSON)")
     print("Goal: Enter raw SQL directly -> Execute against database -> Return pure JSON array instantly, skipping LLM.")
     
+    # Selection fixed: Select id, email from users (no 'role' column since it doesn't exist in SQL database schema)
     raw_query = {
         "workspace_id": workspace_id or 1,
-        "sql_query": "SELECT id, email, role FROM users LIMIT 5"
+        "sql_query": "SELECT id, email FROM users LIMIT 5"
     }
     
     print(f"🔹 Executing Direct Raw SQL Query: '{raw_query['sql_query']}'")
@@ -182,16 +190,21 @@ def main():
         response = client.post(f"{backend_url}/api/query/raw", json=raw_query, timeout=10.0)
         if response.status_code == 200:
             result = response.json()
-            print("\n🎉 E2E Scenario 2 Completed Successfully!")
-            print(f"⚙️  Executed SQL: {result.get('sql')}")
-            print(f"📊 Response Status: {result.get('status')}")
-            print("-" * 80)
-            print("💾 Raw JSON Results Returned (No LLM):")
-            import json
-            print(json.dumps(result.get("query_results"), indent=2))
-            print("-" * 80)
+            if result.get("status") == "success":
+                print("\n🎉 E2E Scenario 2 Completed Successfully!")
+                print(f"⚙️  Executed SQL: {result.get('sql')}")
+                print(f"📊 Response Status: {result.get('status')}")
+                print("-" * 80)
+                print("💾 Raw JSON Results Returned (No LLM):")
+                import json
+                print(json.dumps(result.get("query_results"), indent=2))
+                print("-" * 80)
+            else:
+                print("\n❌ E2E Scenario 2 Failed on Backend SQL Execution!")
+                print(f"⚙️  SQL: {raw_query['sql_query']}")
+                print(f"⚠️  Backend Error: {result.get('message')}")
         else:
-            print(f"❌ Scenario 2 Failed: {response.status_code} - {response.text}")
+            print(f"❌ Scenario 2 Failed with status code {response.status_code}: {response.text}")
     except Exception as e:
         print(f"❌ Scenario 2 request failed: {e}")
 
