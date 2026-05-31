@@ -13,17 +13,6 @@ router = APIRouter(
     prefix="/api"
 )
 
-@router.post("/workspaces")
-def create_workspace_route(
-    data: WorkspaceRequest,
-    db: Session = Depends(get_db)
-):
-    return create_workspace(
-        db,
-        data.name,
-        data.owner_id
-    )
-
 @router.get("/workspaces")
 def get_workspaces_route(
     db: Session = Depends(get_db)
