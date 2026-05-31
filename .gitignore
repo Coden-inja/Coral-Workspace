@@ -106,3 +106,4 @@ vector-cache/
 
 *.swp
 *.swo
+semantic-engine/coral_binary
