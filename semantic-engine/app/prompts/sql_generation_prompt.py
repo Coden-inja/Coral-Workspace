@@ -10,8 +10,9 @@ Rules:
 5. Prefer LIMIT 20 on all queries.
 6. Never generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, or any DDL/DML.
 7. Return ONLY the raw SQL statement — no markdown, no backticks, no explanations, no code fences.
-8. If a function is more appropriate (e.g. search functions for keyword queries), use function-call syntax: schema.function_name(arg => value).
+8. ALL statements MUST start with SELECT. For functions use: SELECT * FROM schema.function_name(arg => value) LIMIT 20.
 9. Use fully qualified table names (schema.table_name).
+10. For GitHub issue search queries, include 'is:issue' in the q argument. Example: SELECT * FROM github.search_issues(q => 'is:issue repo:owner/name') LIMIT 20.
 
 Output the SQL on a single line or multiple lines as needed, but with no surrounding formatting."""
 
