@@ -56,27 +56,27 @@ def main():
     
     signup_data = {
         "email": "test_analyst@coralteams.io",
-        "name": "Lead Analyst Jordan",
-        "password": "SecurePassword123",
-        "role": "admin"
+        "password": "SecurePassword123"
     }
     
     print(f"🔹 Registering new account: {signup_data['email']}...")
     try:
         # First, try to login in case the user already exists
         login_response = client.post(
-            f"{backend_url}/auth/login",
-            json={"email": signup_data["email"], "password": signup_data["password"]}
+            f"{backend_url}/api/login",
+            json=signup_data
         )
         if login_response.status_code == 200:
             print("ℹ️  User already existed. Logging in directly...")
             token = login_response.json().get("access_token")
         else:
             # Register if not exists
-            register_response = client.post(f"{backend_url}/auth/register", json=signup_data)
+            register_response = client.post(f"{backend_url}/api/register", json=signup_data)
             if register_response.status_code == 200:
                 print("✅ Account created successfully in PostgreSQL!")
-                token = register_response.json().get("access_token")
+                # Log in to get token
+                login_resp = client.post(f"{backend_url}/api/login", json=signup_data)
+                token = login_resp.json().get("access_token")
             else:
                 print(f"❌ Registration failed: {register_response.status_code} - {register_response.text}")
                 sys.exit(1)
@@ -98,19 +98,18 @@ def main():
     print("Goal: Test Postgres workspace tables & dynamic environment setup.")
     
     workspace_data = {
-        "name": "Demo Harbor Workspace",
-        "description": "Secure workspace boundary for multi-cloud validation operations."
+        "name": "Demo Harbor Workspace"
     }
     
     print(f"🔹 Creating Workspace boundary: '{workspace_data['name']}'...")
     try:
-        response = client.post(f"{backend_url}/workspaces", json=workspace_data)
+        response = client.post(f"{backend_url}/api/workspaces", json=workspace_data)
         if response.status_code == 200:
             workspace_id = response.json().get("id")
             print(f"✅ Workspace provisioned successfully! ID: {workspace_id}")
         else:
             # Fallback if list is already populated
-            list_resp = client.get(f"{backend_url}/workspaces")
+            list_resp = client.get(f"{backend_url}/api/workspaces")
             if list_resp.status_code == 200 and len(list_resp.json()) > 0:
                 workspace_id = list_resp.json()[0].get("id")
                 print(f"ℹ️  Reusing existing Workspace boundary. ID: {workspace_id}")
@@ -128,49 +127,45 @@ def main():
     print("Goal: Configure dynamic data connector endpoints for logs ingestion.")
     
     connector_data = {
-        "name": "Slack Operations Feed",
-        "type": "slack",
-        "configuration": {"channel": "#security-alerts", "webhook_url": "https://hooks.slack.com/services/123"},
-        "workspace_id": workspace_id
+        "workspace_id": workspace_id,
+        "credentials": "xoxb-slack-token-mock-123456"
     }
     
-    print(f"🔹 Connecting connector '{connector_data['name']}' to Workspace {workspace_id}...")
+    print(f"🔹 Connecting Slack connector to Workspace {workspace_id}...")
     try:
-        response = client.post(f"{backend_url}/connectors", json=connector_data)
+        response = client.post(f"{backend_url}/api/connectors/slack", json=connector_data)
         if response.status_code == 200:
             connector_id = response.json().get("id")
-            print(f"✅ Connector connected successfully! ID: {connector_id}")
+            print(f"✅ Slack Connector connected successfully! ID: {connector_id}")
         else:
             print(f"❌ Connector failed: {response.status_code} - {response.text}")
     except Exception as e:
         print(f"❌ Scenario 3 Failed: {e}")
 
     # =========================================================================
-    # SCENARIO 4: Natural Language AI Grounding & CEO Report (LLM Flow)
+    # SCENARIO 4: Natural Language AI Grounding & CEO Report (Dual-Stage LLM)
     # =========================================================================
     print_section("4. Natural Language AI Grounding & CEO Report (Dual-Stage LLM)")
     print("Goal: Test NL-to-SQL parsing, data execution, and final Colab LLM synthesization.")
     
     query_payload = {
-        "query": "Which employees resolved the most incidents?",
-        "workspace_id": workspace_id
+        "workspace_id": workspace_id,
+        "query_text": "Which employees resolved the most incidents?"
     }
     
     print(f"🔹 Submitting Natural Language Query to LLM...")
-    print(f"👉 Query: '{query_payload['query']}'")
+    print(f"👉 Query: '{query_payload['query_text']}'")
     try:
-        response = client.post(f"{backend_url}/query", json=query_payload, timeout=120.0)
+        response = client.post(f"{backend_url}/api/query/nl", json=query_payload, timeout=120.0)
         if response.status_code == 200:
             result = response.json()
             print("\n🎉 E2E MULTI-CLOUD PIPELINE COMPLETED SUCCESSFULLY!")
-            print(f"🤖 User Query: {result.get('query')}")
+            print(f"🤖 User Query: {result.get('query_text')}")
             print(f"⚙️  Generated SQL: {result.get('generated_sql')}")
             print("-" * 75)
-            print("🤖 Conversational Response (Synthesized Conversational ground from Google Colab GPU):")
-            coral_response = result.get("coral_response", {})
-            print(coral_response.get("answer", "No response synthesized."))
+            print("🤖 Conversational Response (Synthesized Grounded Answer from Google Colab GPU):")
+            print(result.get("conversational_response", "No response synthesized."))
             print("-" * 75)
-            print(f"📊 Confidence Score: {coral_response.get('confidence', 'N/A')}")
         else:
             print(f"❌ End-to-End Query Failed with status code {response.status_code}: {response.text}")
             print("   Please check that your Colab Ollama is serving on the dynamic tunnel.")
