@@ -126,7 +126,6 @@ function SidebarContent({
   };
 
   const isItemActive = (item: SidebarNavItem) => {
-    if (activeItemId) return item.id === activeItemId;
     if (item.href === "/overview") return pathname === "/overview" || pathname === "/";
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
