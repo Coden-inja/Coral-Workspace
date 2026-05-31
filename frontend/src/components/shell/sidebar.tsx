@@ -7,11 +7,13 @@ import {
   Settings,
   ShieldAlert,
   Users,
+  LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { StatusBadge } from "@/components/shared/status-badge";
+import { useAuth } from "@/hooks/use-auth";
 
 export type SidebarNavItem = {
   id: string;
@@ -115,6 +117,13 @@ function SidebarContent({
   onCloseMobile,
 }: SidebarContentProps) {
   const pathname = usePathname();
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   const isItemActive = (item: SidebarNavItem) => {
     if (activeItemId) return item.id === activeItemId;
@@ -192,17 +201,28 @@ function SidebarContent({
         ))}
       </nav>
 
-      <div className="border-t border-zinc-800 px-4 py-3.5">
-        {roleLabel ? (
-          <StatusBadge
-            label={roleLabel}
-            tone="neutral"
-            size="sm"
-            className="mb-2.5 normal-case tracking-[0.06em] text-zinc-500"
-          />
-        ) : null}
-        <p className="text-[13px] font-medium text-zinc-500/80">CoralTeams</p>
-        <p className="mt-0.5 text-[11px] leading-snug text-zinc-600/70">Enterprise AI Operations Infrastructure</p>
+      <div className="border-t border-zinc-800 px-4 py-3.5 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          {roleLabel ? (
+            <StatusBadge
+              label={roleLabel}
+              tone="neutral"
+              size="sm"
+              className="normal-case tracking-[0.06em] text-zinc-500"
+            />
+          ) : <span />}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-red-400 hover:bg-red-950/20 hover:text-red-300 transition-colors"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sign out
+          </button>
+        </div>
+        <div>
+          <p className="text-[13px] font-medium text-zinc-500/80">CoralTeams</p>
+          <p className="mt-0.5 text-[11px] leading-snug text-zinc-600/70">Enterprise AI Operations Infrastructure</p>
+        </div>
       </div>
     </div>
   );
