@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8001
 
-    model_name: str = "llama3.2"
+    model_name: str = "qwen3:8b"
     ollama_host: str = "https://jarrod-unannulled-opposedly.ngrok-free.dev"
 
     coral_binary: str = "coral"
