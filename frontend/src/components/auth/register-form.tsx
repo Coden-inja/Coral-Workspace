@@ -56,7 +56,7 @@ export function RegisterForm() {
 
   return (
     <AuthShell
-      title="Create your CoralOps account"
+      title="Create your CoralTeams account"
       description="Register for secure access to investigation operations."
       footer={
         <p>
@@ -92,7 +92,7 @@ export function RegisterForm() {
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="you@coralops.io"
+            placeholder="you@coralteams.io"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             hasError={Boolean(fieldErrors.email)}

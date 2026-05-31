@@ -24,8 +24,8 @@ export default async function OpsLayout({ children }: OpsLayoutProps) {
   return (
     <OpsRouteGuard>
       <OpsDashboardShell
-        workspaceName="CoralOps SOC"
-        topbarTitle="CoralOps Investigation Operations"
+        workspaceName="CoralTeams SOC"
+        topbarTitle="CoralTeams Investigation Operations"
         environment="Production"
         metrics={metrics}
       >

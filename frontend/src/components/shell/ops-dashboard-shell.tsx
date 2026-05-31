@@ -34,8 +34,8 @@ const ROLE_BADGE_TONES: Record<UserRole, StatusTone> = {
 export function OpsDashboardShell({
   children,
   metrics,
-  workspaceName = "CoralOps SOC",
-  topbarTitle = "CoralOps Investigation Operations",
+  workspaceName = "CoralTeams SOC",
+  topbarTitle = "CoralTeams Investigation Operations",
   environment = "Production",
 }: OpsDashboardShellProps) {
   const { role } = useAuth();

@@ -21,7 +21,7 @@ export default function GlobalError({
             <p className="text-xs uppercase tracking-[0.08em] text-zinc-400">Operational Resilience</p>
             <h1 className="mt-2 text-lg font-semibold text-zinc-100">Unexpected application fault</h1>
             <p className="mt-2 text-sm text-zinc-300">
-              CoralOps recovered into a safe state boundary. You can retry the last render without losing route context.
+              CoralTeams recovered into a safe state boundary. You can retry the last render without losing route context.
             </p>
             <button
               type="button"

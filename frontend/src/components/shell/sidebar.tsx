@@ -49,7 +49,7 @@ const SIDEBAR_WIDTH = "w-[15.5rem]";
 
 export function Sidebar({
   items,
-  workspaceName = "CoralOps SOC",
+  workspaceName = "CoralTeams SOC",
   environment = "Production",
   roleLabel,
   activeItemId,
@@ -133,7 +133,7 @@ function SidebarContent({
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900">
           <span className="text-[11px] font-bold tracking-tight text-blue-400/90">C</span>
         </div>
-        <span className="text-sm font-semibold tracking-tight text-zinc-100">CoralOps</span>
+        <span className="text-sm font-semibold tracking-tight text-zinc-100">CoralTeams</span>
       </div>
 
       <div className="border-b border-zinc-800 px-4 py-3.5">
@@ -201,7 +201,7 @@ function SidebarContent({
             className="mb-2.5 normal-case tracking-[0.06em] text-zinc-500"
           />
         ) : null}
-        <p className="text-[13px] font-medium text-zinc-500/80">CoralOps</p>
+        <p className="text-[13px] font-medium text-zinc-500/80">CoralTeams</p>
         <p className="mt-0.5 text-[11px] leading-snug text-zinc-600/70">Enterprise AI Operations Infrastructure</p>
       </div>
     </div>

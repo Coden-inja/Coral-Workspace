@@ -46,7 +46,7 @@ export function LoginForm() {
 
   return (
     <AuthShell
-      title="Sign in to CoralOps"
+      title="Sign in to CoralTeams"
       description="Access your investigation operations workspace."
       footer={
         <p>
@@ -68,7 +68,7 @@ export function LoginForm() {
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="you@coralops.io"
+            placeholder="you@coralteams.io"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             hasError={Boolean(fieldErrors.email)}
