@@ -45,3 +45,15 @@ def connect_figma(
         "figma",
         data.credentials
     )
+
+@router.post("/notion")
+def connect_notion(
+    data: ConnectorRequest,
+    db: Session = Depends(get_db)
+):
+    return create_connector(
+        db,
+        data.workspace_id,
+        "notion",
+        data.credentials
+    )
