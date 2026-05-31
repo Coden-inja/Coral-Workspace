@@ -42,3 +42,7 @@ app.add_middleware(
 
 app.include_router(health.router, tags=["health"])
 app.include_router(query.router, prefix="/query", tags=["query"])
+
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "CoralTeams Semantic Engine Running"}
