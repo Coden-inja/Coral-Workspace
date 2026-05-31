@@ -3,12 +3,14 @@ import sys
 import httpx
 
 def print_section(title):
-    print("\n" + "=" * 65)
-    print(f" {title}")
-    print("=" * 65)
+    print("\n" + "=" * 80)
+    print(f" 🛡️  SCENARIO: {title}")
+    print("=" * 80)
 
 def main():
-    print_section("🔍 CORALTEAMS HYBRID ARCHITECTURE CONNECTIVITY TEST")
+    print("\n" + "█" * 80)
+    print("        CORALTEAMS E2E SECURITY STACK VALIDATION SUITE        ")
+    print("█" * 80)
     
     # 1. Read Backend URL from frontend/.env
     env_path = "frontend/.env"
@@ -26,74 +28,159 @@ def main():
         print("❌ Error: NEXT_PUBLIC_API_URL not set in frontend/.env.")
         sys.exit(1)
         
-    print(f"📍 Read Backend Tunnel URL: {backend_url}")
+    print(f"📍 Connected Backend Tunnel URL: {backend_url}")
     
-    # 2. Ping Backend
-    print("\n🛰️  Step 1: Pinging Backend Codespace Tunnel...")
+    # 2. Test Backend Health Check
     try:
         response = httpx.get(f"{backend_url}/", timeout=10.0)
         if response.status_code == 200:
-            print(f"✅ Backend Online! Response: {response.json()}")
+            print(f"✅ Connection Established! Backend response: {response.json()}")
         else:
             print(f"❌ Backend returned status code {response.status_code}: {response.text}")
+            sys.exit(1)
     except Exception as e:
-        print(f"❌ Failed to connect to Backend: {e}")
-        print("   Make sure your GitHub Codespace is running and the Ngrok tunnel is alive.")
+        print(f"❌ Failed to connect to Backend tunnel: {e}")
+        print("   Please ensure your GitHub Codespace is active and Ngrok is serving.")
         sys.exit(1)
-        
-    # 3. Ping Render Semantic Engine
-    semantic_url = "https://coral-workspace.onrender.com"
-    print(f"\n🛰️  Step 2: Pinging Render Semantic Engine ({semantic_url})...")
-    try:
-        response = httpx.get(semantic_url, timeout=15.0)
-        if response.status_code == 200:
-            print(f"✅ Semantic Engine Online! Response: {response.json()}")
-        else:
-            print(f"❌ Semantic Engine returned status code {response.status_code}: {response.text}")
-    except Exception as e:
-        print(f"❌ Failed to connect to Semantic Engine: {e}")
-        
-    # 4. Check Colab Ollama Connectivity via Semantic Engine
-    print("\n🛰️  Step 3: Checking Google Colab LLM Connection via Semantic Engine health check...")
-    try:
-        response = httpx.get(f"{semantic_url}/health", timeout=20.0)
-        if response.status_code == 200:
-            data = response.json()
-            print(f"✅ Health Check Succeeded: {data}")
-        else:
-            print(f"❌ Health Check returned status code {response.status_code}: {response.text}")
-    except Exception as e:
-        print(f"❌ Health Check Connection Failed: {e}")
 
-    # 5. Run Live End-to-End Query
-    print_section("⚡ RUNNING LIVE END-TO-END QUERY TEST")
-    print("Submitting natural language query: 'Which employees resolved the most incidents?'")
+    client = httpx.Client(timeout=120.0)
+    token = None
+    workspace_id = None
+    connector_id = None
+
+    # =========================================================================
+    # SCENARIO 1: Security Authentication & Session Handshake
+    # =========================================================================
+    print_section("1. Security Authentication & Session Handshake")
+    print("Goal: Test user database write, password hashing, and JWT token issuance.")
     
-    # We use workspace_id 1 for demo purposes
-    query_payload = {
-        "query": "Which employees resolved the most incidents?",
-        "workspace_id": 1
+    signup_data = {
+        "email": "test_analyst@coralteams.io",
+        "name": "Lead Analyst Jordan",
+        "password": "SecurePassword123",
+        "role": "admin"
     }
     
+    print(f"🔹 Registering new account: {signup_data['email']}...")
     try:
-        # Backend query route is POST to /query
-        response = httpx.post(f"{backend_url}/query", json=query_payload, timeout=120.0)
+        # First, try to login in case the user already exists
+        login_response = client.post(
+            f"{backend_url}/auth/login",
+            json={"email": signup_data["email"], "password": signup_data["password"]}
+        )
+        if login_response.status_code == 200:
+            print("ℹ️  User already existed. Logging in directly...")
+            token = login_response.json().get("access_token")
+        else:
+            # Register if not exists
+            register_response = client.post(f"{backend_url}/auth/register", json=signup_data)
+            if register_response.status_code == 200:
+                print("✅ Account created successfully in PostgreSQL!")
+                token = register_response.json().get("access_token")
+            else:
+                print(f"❌ Registration failed: {register_response.status_code} - {register_response.text}")
+                sys.exit(1)
+        
+        if token:
+            print(f"🔑 JWT Token issued: {token[:25]}...")
+            client.headers.update({"Authorization": f"Bearer {token}"})
+        else:
+            print("❌ Token extraction failed.")
+            sys.exit(1)
+    except Exception as e:
+        print(f"❌ Scenario 1 Failed: {e}")
+        sys.exit(1)
+
+    # =========================================================================
+    # SCENARIO 2: Workspace Boundary Provisioning
+    # =========================================================================
+    print_section("2. Workspace Boundary Provisioning")
+    print("Goal: Test Postgres workspace tables & dynamic environment setup.")
+    
+    workspace_data = {
+        "name": "Demo Harbor Workspace",
+        "description": "Secure workspace boundary for multi-cloud validation operations."
+    }
+    
+    print(f"🔹 Creating Workspace boundary: '{workspace_data['name']}'...")
+    try:
+        response = client.post(f"{backend_url}/workspaces", json=workspace_data)
+        if response.status_code == 200:
+            workspace_id = response.json().get("id")
+            print(f"✅ Workspace provisioned successfully! ID: {workspace_id}")
+        else:
+            # Fallback if list is already populated
+            list_resp = client.get(f"{backend_url}/workspaces")
+            if list_resp.status_code == 200 and len(list_resp.json()) > 0:
+                workspace_id = list_resp.json()[0].get("id")
+                print(f"ℹ️  Reusing existing Workspace boundary. ID: {workspace_id}")
+            else:
+                print(f"❌ Workspace creation failed: {response.status_code} - {response.text}")
+                sys.exit(1)
+    except Exception as e:
+        print(f"❌ Scenario 2 Failed: {e}")
+        sys.exit(1)
+
+    # =========================================================================
+    # SCENARIO 3: Log Ingestion & Data Connectors Setup
+    # =========================================================================
+    print_section("3. Log Ingestion & Data Connectors Setup")
+    print("Goal: Configure dynamic data connector endpoints for logs ingestion.")
+    
+    connector_data = {
+        "name": "Slack Operations Feed",
+        "type": "slack",
+        "configuration": {"channel": "#security-alerts", "webhook_url": "https://hooks.slack.com/services/123"},
+        "workspace_id": workspace_id
+    }
+    
+    print(f"🔹 Connecting connector '{connector_data['name']}' to Workspace {workspace_id}...")
+    try:
+        response = client.post(f"{backend_url}/connectors", json=connector_data)
+        if response.status_code == 200:
+            connector_id = response.json().get("id")
+            print(f"✅ Connector connected successfully! ID: {connector_id}")
+        else:
+            print(f"❌ Connector failed: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"❌ Scenario 3 Failed: {e}")
+
+    # =========================================================================
+    # SCENARIO 4: Natural Language AI Grounding & CEO Report (LLM Flow)
+    # =========================================================================
+    print_section("4. Natural Language AI Grounding & CEO Report (Dual-Stage LLM)")
+    print("Goal: Test NL-to-SQL parsing, data execution, and final Colab LLM synthesization.")
+    
+    query_payload = {
+        "query": "Which employees resolved the most incidents?",
+        "workspace_id": workspace_id
+    }
+    
+    print(f"🔹 Submitting Natural Language Query to LLM...")
+    print(f"👉 Query: '{query_payload['query']}'")
+    try:
+        response = client.post(f"{backend_url}/query", json=query_payload, timeout=120.0)
         if response.status_code == 200:
             result = response.json()
-            print("\n🎉 SUCCESS! E2E QUERY FLOW COMPLETED SUCCESSFULLY!")
-            print(f"📝 User Query: {result.get('query')}")
+            print("\n🎉 E2E MULTI-CLOUD PIPELINE COMPLETED SUCCESSFULLY!")
+            print(f"🤖 User Query: {result.get('query')}")
             print(f"⚙️  Generated SQL: {result.get('generated_sql')}")
-            print("-" * 50)
-            print("🤖 Conversational Response (CEO Conversational grounded answer):")
+            print("-" * 75)
+            print("🤖 Conversational Response (Synthesized Conversational ground from Google Colab GPU):")
             coral_response = result.get("coral_response", {})
-            print(coral_response.get("answer", "No answer parsed."))
-            print("-" * 50)
+            print(coral_response.get("answer", "No response synthesized."))
+            print("-" * 75)
             print(f"📊 Confidence Score: {coral_response.get('confidence', 'N/A')}")
         else:
             print(f"❌ End-to-End Query Failed with status code {response.status_code}: {response.text}")
+            print("   Please check that your Colab Ollama is serving on the dynamic tunnel.")
     except Exception as e:
         print(f"❌ End-to-End Query Connection Failed: {e}")
         print("   Verify all dynamic tunnels are active and Colab is listening.")
+
+    print("\n" + "█" * 80)
+    print("               CORALTEAMS E2E VALIDATION RUN COMPLETED!               ")
+    print("█" * 80 + "\n")
 
 if __name__ == "__main__":
     main()
