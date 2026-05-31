@@ -3,7 +3,7 @@ from app.models.query_model import Query
 import httpx
 import os
 
-SEMANTIC_ENGINE_URL = os.getenv("SEMANTIC_ENGINE_URL", "https://coral-workspace.onrender.com")
+SEMANTIC_ENGINE_URL = os.getenv("SEMANTIC_ENGINE_URL", "http://localhost:8001")
 
 def create_query(
     db: Session,
