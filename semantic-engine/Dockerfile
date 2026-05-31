@@ -1,12 +1,29 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
+# Install Coral binary
+# Note: coral_binary must be present in the semantic-engine/ directory during build context
+COPY coral_binary /usr/local/bin/coral
+RUN chmod +x /usr/local/bin/coral
+
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the semantic engine code
 COPY . .
 
+# Ensure entrypoint is executable
+RUN chmod +x entrypoint.sh
+
+# Expose the semantic engine port
 EXPOSE 8001
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+ENTRYPOINT ["./entrypoint.sh"]
