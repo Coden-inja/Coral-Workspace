@@ -9,10 +9,15 @@ from app.services.workspace_service import (
 )
 from app.security import get_current_user
 from app.models.user import User
-
 router = APIRouter(
     prefix="/api"
 )
+
+@router.get("/workspaces")
+def get_workspaces_route(
+    db: Session = Depends(get_db)
+):
+    return get_workspaces(db)
 
 @router.post("/workspaces")
 def create_workspace_route(
@@ -20,14 +25,9 @@ def create_workspace_route(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+
     return create_workspace(
         db,
         data.name,
         current_user.id
     )
-
-@router.get("/workspaces")
-def get_workspaces_route(
-    db: Session = Depends(get_db)
-):
-    return get_workspaces(db)

@@ -13,6 +13,7 @@ type DashboardShellProps = {
   activeItemId?: string;
   topbarTitle?: string;
   environment?: string;
+  roleLabel?: string;
   topbarActions?: ReactNode;
 };
 
@@ -39,6 +40,7 @@ export function DashboardShell({
   activeItemId = "overview",
   topbarTitle,
   environment,
+  roleLabel,
   topbarActions,
 }: DashboardShellProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -51,6 +53,8 @@ export function DashboardShell({
         <Sidebar
           items={resolvedNavItems}
           workspaceName={workspaceName}
+          environment={environment}
+          roleLabel={roleLabel}
           activeItemId={activeItemId}
           isMobileOpen={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
@@ -66,7 +70,7 @@ export function DashboardShell({
           />
 
           <main className="flex-1 p-4 lg:p-6">
-            <section className="min-h-full rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 lg:p-6">
+            <section className="min-h-full rounded-xl border border-zinc-800/80 bg-zinc-950/80 p-4 lg:p-6">
               {children}
             </section>
           </main>

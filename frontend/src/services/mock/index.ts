@@ -1,5 +1,10 @@
+export { getMockAdminDashboardSnapshot } from "@/services/mock/admin-dashboard";
+export { getMockAiAnalysisSnapshot } from "@/services/mock/ai-analysis";
+export { MOCK_USERS, mockLogin, mockRegister } from "@/services/mock/auth";
 export { generateMockOpsEvent } from "@/services/mock/events";
 export { getMockAttackChain } from "@/services/mock/graph";
 export { getMockInvestigationById, getMockInvestigations, getMockRecentAlerts, getMockTimeline } from "@/services/mock/investigations";
 export { initialMockAgentRuntime, initialMockConnectorStatus } from "@/services/mock/operations";
+export { getMockSettingsPageSnapshot } from "@/services/mock/settings";
 export { getEvidenceTelemetry } from "@/services/mock/telemetry";
+export { getMockUsersPageSnapshot } from "@/services/mock/users";

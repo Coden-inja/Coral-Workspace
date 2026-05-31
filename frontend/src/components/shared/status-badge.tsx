@@ -12,16 +12,16 @@ type StatusBadgeProps = {
 };
 
 const toneStyles: Record<StatusTone, string> = {
-  neutral: "border-zinc-700/90 bg-zinc-900/90 text-zinc-300",
-  healthy: "border-emerald-800/70 bg-emerald-950/45 text-emerald-300",
-  warning: "border-amber-800/70 bg-amber-950/45 text-amber-300",
-  critical: "border-red-800/70 bg-red-950/45 text-red-300",
-  info: "border-blue-800/70 bg-blue-950/45 text-blue-300",
+  neutral: "border-zinc-700/80 bg-zinc-900/70 text-zinc-400/90",
+  healthy: "border-[rgba(34,197,94,0.18)] bg-[rgba(34,197,94,0.08)] text-emerald-300/65",
+  warning: "border-[rgba(245,158,11,0.18)] bg-[rgba(245,158,11,0.08)] text-amber-300/65",
+  critical: "border-[rgba(239,68,68,0.18)] bg-[rgba(239,68,68,0.08)] text-red-300/65",
+  info: "border-[rgba(59,130,246,0.18)] bg-[rgba(59,130,246,0.08)] text-blue-300/65",
 };
 
 const sizeStyles: Record<StatusSize, string> = {
-  sm: "px-2 py-0.5 text-[11px]",
-  md: "px-2.5 py-1 text-xs",
+  sm: "px-1.5 py-0.5 text-[10px]",
+  md: "px-2 py-0.5 text-[11px]",
 };
 
 export function StatusBadge({
@@ -33,7 +33,7 @@ export function StatusBadge({
   return (
     <span
       className={[
-        "inline-flex items-center rounded-md border font-semibold uppercase tracking-[0.04em]",
+        "inline-flex items-center rounded border font-medium uppercase tracking-[0.05em]",
         toneStyles[tone],
         sizeStyles[size],
         className,

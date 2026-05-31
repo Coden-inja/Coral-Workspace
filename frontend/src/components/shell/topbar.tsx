@@ -18,10 +18,10 @@ type TopbarProps = {
 };
 
 const toneClasses: Record<NonNullable<TopbarMetric["tone"]>, string> = {
-  default: "border-zinc-700 bg-zinc-900 text-zinc-300",
-  healthy: "border-emerald-800/60 bg-emerald-950/40 text-emerald-300",
-  warning: "border-amber-800/60 bg-amber-950/40 text-amber-300",
-  critical: "border-red-800/60 bg-red-950/40 text-red-300",
+  default: "border-zinc-800 bg-zinc-950 text-zinc-400",
+  healthy: "border-zinc-800 bg-zinc-950 text-zinc-400",
+  warning: "border-[rgba(245,158,11,0.2)] bg-zinc-950 text-zinc-400",
+  critical: "border-[rgba(239,68,68,0.2)] bg-zinc-950 text-zinc-400",
 };
 
 export function Topbar({
@@ -60,7 +60,7 @@ export function Topbar({
               ].join(" ")}
             >
               <span className="mr-1 text-zinc-400">{metric.label}:</span>
-              <span className="font-medium">{metric.value}</span>
+              <span className="font-medium text-zinc-200">{metric.value}</span>
             </div>
           ))}
         </div>
@@ -78,7 +78,7 @@ export function Topbar({
             ].join(" ")}
           >
             <span className="mr-1 text-zinc-400">{metric.label}:</span>
-            <span className="font-medium">{metric.value}</span>
+            <span className="font-medium text-zinc-200">{metric.value}</span>
           </div>
         ))}
       </div>
