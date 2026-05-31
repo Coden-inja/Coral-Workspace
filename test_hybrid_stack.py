@@ -59,20 +59,22 @@ def main():
         "password": "SecurePassword123"
     }
     
-    print(f"🔹 Registering new account: {signup_data['email']}...")
+    print(f"🔹 Attempting login for test user: {signup_data['email']}...")
     try:
-        # First, try to login in case the user already exists
+        # First, try to log in
         login_response = client.post(
             f"{backend_url}/api/login",
             json=signup_data
         )
-        if login_response.status_code == 200:
-            print("ℹ️  User already existed. Logging in directly...")
-            token = login_response.json().get("access_token")
-        else:
-            # Register if not exists
+        
+        login_data = login_response.json() if login_response.status_code == 200 else {}
+        
+        # If login returned "error", it means the user doesn't exist yet! We must register them.
+        if "error" in login_data or login_response.status_code != 200:
+            print("ℹ️  User does not exist or credentials expired. Registering fresh account...")
             register_response = client.post(f"{backend_url}/api/register", json=signup_data)
-            if register_response.status_code == 200:
+            
+            if register_response.status_code == 200 and "error" not in register_response.json():
                 print("✅ Account created successfully in PostgreSQL!")
                 # Log in to get token
                 login_resp = client.post(f"{backend_url}/api/login", json=signup_data)
@@ -80,12 +82,15 @@ def main():
             else:
                 print(f"❌ Registration failed: {register_response.status_code} - {register_response.text}")
                 sys.exit(1)
+        else:
+            print("ℹ️  User already existed. Logged in successfully!")
+            token = login_data.get("access_token")
         
         if token:
             print(f"🔑 JWT Token issued: {token[:25]}...")
             client.headers.update({"Authorization": f"Bearer {token}"})
         else:
-            print("❌ Token extraction failed.")
+            print(f"❌ Token extraction failed. Response data was: {login_data}")
             sys.exit(1)
     except Exception as e:
         print(f"❌ Scenario 1 Failed: {e}")
@@ -104,11 +109,13 @@ def main():
     print(f"🔹 Creating Workspace boundary: '{workspace_data['name']}'...")
     try:
         response = client.post(f"{backend_url}/api/workspaces", json=workspace_data)
-        if response.status_code == 200:
-            workspace_id = response.json().get("id")
+        workspace_json = response.json() if response.status_code == 200 else {}
+        
+        if response.status_code == 200 and "error" not in workspace_json:
+            workspace_id = workspace_json.get("id")
             print(f"✅ Workspace provisioned successfully! ID: {workspace_id}")
         else:
-            # Fallback if list is already populated
+            # Fallback if list is already populated or error occurs
             list_resp = client.get(f"{backend_url}/api/workspaces")
             if list_resp.status_code == 200 and len(list_resp.json()) > 0:
                 workspace_id = list_resp.json()[0].get("id")
