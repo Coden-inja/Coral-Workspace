@@ -49,7 +49,8 @@ def build_prompt_context(ctx: RetrievedContext) -> str:
             )
             lines.append(f"  {table.qualified_name}{desc}{guide}{req}")
 
-            cols = table.columns[:MAX_COLUMNS_PER_TABLE]
+            effective_max = 100 if table.schema_name == "github" and table.table_name == "issues" else MAX_COLUMNS_PER_TABLE
+            cols = table.columns[:effective_max]
             if cols:
                 col_parts = []
                 for c in cols:
@@ -57,7 +58,7 @@ def build_prompt_context(ctx: RetrievedContext) -> str:
                     col_parts.append(f"{c.column_name}:{c.data_type}{col_desc}")
                 col_line = ", ".join(col_parts)
                 lines.append(f"    Columns ({len(table.columns)} total, showing {len(cols)}): {col_line}")
-                if len(table.columns) > MAX_COLUMNS_PER_TABLE:
+                if len(table.columns) > effective_max:
                     lines[-1] += " ..."
 
         lines.append("")

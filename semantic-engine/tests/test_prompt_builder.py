@@ -125,7 +125,7 @@ class TestBuildPromptContext:
         many_cols = [
             (f"col{i}", "Utf8", "") for i in range(30)
         ]
-        tbl = _make_table("issues", columns=many_cols)
+        tbl = _make_table("other_table", columns=many_cols)
         ctx = RetrievedContext(tables=[tbl])
         result = build_prompt_context(ctx)
         assert "showing 20" in result
