@@ -1,0 +1,20 @@
+from fastapi import APIRouter, Depends
+
+from app.config import settings
+from app.models.health import HealthResponse
+from app.dependencies import get_coral_client
+from app.clients.base import CoralClient
+
+router = APIRouter()
+
+
+@router.get("/health", response_model=HealthResponse)
+async def health(
+    coral: CoralClient = Depends(get_coral_client),
+):
+    coral_status = "connected" if await coral.ping() else "disconnected"
+    return HealthResponse(
+        status="ok",
+        model=f"{settings.model_provider}/{settings.model_name}",
+        coral=coral_status,
+    )
