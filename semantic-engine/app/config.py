@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     model_name: str = "qwen3:8b"
     ollama_host: str = "https://jarrod-unannulled-opposedly.ngrok-free.dev"
 
+    github_token: str = ""
+    figma_pat: str = ""
+
     coral_binary: str = "coral"
     coral_base_url: str = "http://localhost:5555"
     coral_api_key: str = ""

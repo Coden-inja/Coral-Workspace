@@ -33,3 +33,15 @@ def connect_slack(
         "slack",
         data.credentials
     )
+
+@router.post("/figma")
+def connect_figma(
+    data: ConnectorRequest,
+    db: Session = Depends(get_db)
+):
+    return create_connector(
+        db,
+        data.workspace_id,
+        "figma",
+        data.credentials
+    )
