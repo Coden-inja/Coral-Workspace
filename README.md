@@ -1,11 +1,15 @@
 <p align="center">
-  <img src="./assets/banner.png" alt="CoralTeams Banner" width="100%">
+   <img width="1600" height="492" alt="Image" src="https://github.com/user-attachments/assets/7ed48d88-63e3-455f-84d5-d224090fe0c2" />
 </p>
 
 <h1 align="center">CoralTeams</h1>
 
 <p align="center">
   Self-hosted workspace intelligence powered by Coral.
+
+[Watch demo](https://youtu.be/c8SvU8hh4Xg?si=gA6R0G-JbqghWiAd)
+
+  
 </p>
 
 ## Overview
